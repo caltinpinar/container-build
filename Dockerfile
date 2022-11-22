@@ -3,15 +3,17 @@ FROM registry.access.redhat.com/ubi8/httpd-24
 USER 0
 
 
-RUN sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf 
-RUN sed -i "s/#ServerName www.example.com:80/ServerName 0.0.0.0:8080/g" \
+RUN sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf && \
+    sed -i "s/#ServerName www.example.com:80/ServerName 0.0.0.0:8080/g" \
     /etc/httpd/conf/httpd.conf
 
 # Add application sources
 COPY ./index.html /var/www/html/
 
-RUN chgrp -R 0 /var/log/httpd /var/run/httpd
-RUN chmod -R g=u /var/log/httpd /var/run/httpd
+ONBUILD COPY ./src/. /var/www/html/
+
+RUN chgrp -R 0 /var/log/httpd /var/run/httpd && \
+    chmod -R g=u /var/log/httpd /var/run/httpd
 
 EXPOSE 8080
 
